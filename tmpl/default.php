@@ -98,6 +98,19 @@ defined('_JEXEC') or die;
             		<?php endif; ?>
             	<?php endforeach; ?>                            								                               
             </ul>
+            <?php
+                //Load Menu-Right Module
+                $modules = JModuleHelper::getModules("menu-right");
+                if($modules){
+                    $document  = JFactory::getDocument();
+                    $renderer  = $document->loadRenderer('module');
+                    $attribs   = array();
+                    $attribs['style'] = 'none';
+                    foreach($modules as $mod){
+                        echo JModuleHelper::renderModule($mod, $attribs);
+                    }
+                }
+            ?>
         </div><!--/.nav-collapse -->
     </div><!--Container-->
     </div><!-- /.navbar -->
