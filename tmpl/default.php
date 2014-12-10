@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 ?>
 <?php if($use_css == 1) : ?>
+        <link rel="stylesheet" href="<?php echo JURI::base(); ?>media/mod_bootstrapnav/css/bootstrap.css" type="text/css" />
 	<link rel="stylesheet" href="<?php echo JURI::base(); ?>media/mod_bootstrapnav/css/style.css" type="text/css" />
 <?php endif; ?>
 <?php //print_r($list); ?>
