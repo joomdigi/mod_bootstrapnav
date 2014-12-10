@@ -11,7 +11,7 @@
     <license>GNU General Public License version 2 or later</license>
     <authorEmail>brad@joomdigi.com</authorEmail>
     <authorUrl>www.joomdigi.com</authorUrl>
-    <version>1.5</version>
+    <version>1.7</version>
     <description>Joomla bootstrap navbar</description>
 	<files>
 		<filename module="mod_bootstrapnav">mod_bootstrapnav.php</filename>
@@ -58,18 +58,27 @@
 				</field>
 
 				<field
-					name="color"
-					type="list"
-					default="navbar-default"
-					label="MOD_MENU_FIELD_NAV_COLOR_LABEL"
-					description="MOD_MENU_FIELD_NAV_COLOR_DESC">
-					
-					<option
-						value="navbar-default">Light Gray</option>
-						<option
-						value="navbar-inverse">Dark</option>
-					<option
-						value="navbar-white">White</option>
+					name="background_color"
+					type="color"
+					default="#f9f9f9"
+					label="MOD_MENU_FIELD_NAV_BACKGROUND_COLOR_LABEL"
+					description="MOD_MENU_FIELD_NAV_BACKGROUND_COLOR_DESC">					
+				</field>
+
+				<field
+					name="text_color"
+					type="color"
+					default="#333333"
+					label="MOD_MENU_FIELD_NAV_TEXT_COLOR_LABEL"
+					description="MOD_MENU_FIELD_NAV_TEXT_COLOR_DESC">					
+				</field>
+
+				<field
+					name="active_background_color"
+					type="color"
+					default="#f4f4f4"
+					label="MOD_MENU_FIELD_NAV_ACTIVE_BACKGROUND_COLOR_LABEL"
+					description="MOD_MENU_FIELD_NAV_ACTIVE_BACKGROUND_COLOR_DESC">					
 				</field>
 
 				<field
