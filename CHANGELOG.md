@@ -28,3 +28,12 @@
 ### 1.5 / 11-02-2014###
 
 * Changed color field from select to 'color' for hexidecimal values
+* Added menu-right support
+
+### 1.6 / 12-2-2014###
+* Add color option for text
+
+### 1.7 / 12-3-2014###
+* Add color option for active/hover link
+* Cleaned up comments
+* Fixed "Use Bootstrap.css" option

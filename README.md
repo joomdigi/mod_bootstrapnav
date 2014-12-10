@@ -1,10 +1,10 @@
 # Joomla Bootstrap Nav Module #
 
-**Bootstrapnav** is a module for Joomla 2.5+ which takes place of the core Joomla menu module.
+**Bootstrapnav** is a module for Joomla 2.5 and Joomla 3.x which takes place of the core Joomla menu module and uses a Bootstrap Navbar with dropdown functionality.
 
 
 ## Version ##
-**1.5**
+**1.7**
 
 ## Demo ##
 To view a live demo, please go to - [http://demo.bootstrapjoomla.com/](http://demo.bootstrapjoomla.com/)
