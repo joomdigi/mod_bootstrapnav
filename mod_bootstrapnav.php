@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="<?php echo JURI::base(); ?>media/mod_bootstrapnav/css/bootstrap.css" type="text/css" />
 
 <?php
 /**
