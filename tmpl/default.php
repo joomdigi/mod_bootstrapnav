@@ -36,10 +36,6 @@ defined('_JEXEC') or die;
     visibility: visible;
 }
 
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-
 .nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {
     margin-top: 0;
 }
@@ -84,33 +80,10 @@ defined('_JEXEC') or die;
         </div><!-- /.navbar-header -->
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav <?php echo $float; ?>">
-                <?php foreach ($list as $i => &$item) : ?>
-                <?php 
-                $class = $item->id;
-                if($item->id == $active_id){
-                    //$class .= ' current';
-                }
-                if (in_array($item->id, $path)){
-                    $class .= ' active';
-                }
-                ?>
-                    <?php if(!$item->parent) : ?>
-                        <?php if($item->level == 1) : ?>
-                            <li class="<?php echo $class; ?>"><a href="<?php echo $item->flink; ?>"><?php echo $item->title; ?></a></li>
-                        <?php endif; ?>
-                    <?php elseif($item->parent) : ?>
-                         <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?php echo $item->title; ?> <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <?php foreach ($list as $i => &$subitem) : ?>                                   
-                                <?php if($subitem->parent_id == $item->id) : ?>
-                                    <li><a href="<?php echo $subitem->flink; ?>"><?php echo $subitem->title; ?></a></li>
-                                <?php endif; ?>       
-                        <?php endforeach; ?>
-                    </ul>
-                </li>
-                    <?php endif; ?>
-                <?php endforeach; ?>                                                                                           
+			<?php
+				$bootstrap_menu = ModBootstrapnavHelper::Build_BootStrap_Menu($list, $path, $active_id, $show_subnav);
+				echo $bootstrap_menu;
+			?>
             </ul>
             <?php
                 //Load Menu-Right Module

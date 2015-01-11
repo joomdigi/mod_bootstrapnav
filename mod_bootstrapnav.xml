@@ -144,6 +144,21 @@
 					<option
 						value="1">Yes</option>
 				</field>
+				
+				<field
+					name="show_subnav"
+					type="list"
+					default="1"
+					label="MOD_MENU_FIELD_SHOW_SUBNAV"
+					description="MOD_MENU_FIELD_SHOW_SUBNAV_DESC">
+					<option
+						value="0">No</option>
+					<option
+						value="1">Yes</option>
+				</field>
+				
+				<field type="spacer" />
+				
 			</fieldset>
 
 			<fieldset
