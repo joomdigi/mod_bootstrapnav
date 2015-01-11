@@ -168,6 +168,10 @@ class ModBootstrapnavHelper
         
         $bootstrap_menu = array();
         
+        if (!count($list)) {
+            return "";
+        }
+        
         foreach ($list as $i => &$item) {
             
             $class = '';
@@ -179,7 +183,7 @@ class ModBootstrapnavHelper
                 $class .= ' active';
             }
             
-            $bootstrap_menu[] = self::Build_BootStrap_MenuItem($item, $class, $list, $show_subnav);
+            $bootstrap_menu[$item->id] = self::Build_BootStrap_MenuItem($item, $class, $list, $show_subnav);
             
         }
         
@@ -199,17 +203,25 @@ class ModBootstrapnavHelper
      * @param array $list
      * @param boolean $show_subnav
      * @return  html
+     * http://bootsnipp.com/snippets/featured/multi-level-navbar-menu
      * @author Michael Jones <mikegrahamjones@gmail.com>
      */
-    public static function Build_BootStrap_MenuItem($item, $item_class, $list, $show_subnav = TRUE)
+    public static function Build_BootStrap_MenuItem($item, $item_class, &$list, $show_subnav = TRUE, $subnav_class = NULL)
     {
         
         $menu_item = array();
         
+        if ($item_class) {
+            $item_class     = trim($item_class);
+            $css_item_class = "class=\"{$item_class}\"";
+        } else {
+            $css_item_class = "";
+        }
+        
         if (!$item->parent) {
             
             if ($item->level == 1) {
-                $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
+                $menu_item[] = "<li {$css_item_class} ><a class=\"top-level-menu-item\" href=\"{$item->flink}\">{$item->title}</a></li>";
             }
             
         } else {
@@ -218,23 +230,56 @@ class ModBootstrapnavHelper
                 
                 if ($item->level == 1) {
                     
-                    $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
+                    $menu_item[] = "<li {$css_item_class} ><a class=\"top-level-menu-item\"  href=\"{$item->flink}\">{$item->title}</a></li>";
                     
                 }
                 
             } else {
                 
-                $menu_item[] = "<li class=\"dropdown\">";
-                $menu_item[] = "<a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">{$item->title}<span class=\"caret_spacer\"></span><b class=\"caret\"></b></a>";
-                $menu_item[] = "<ul class=\"dropdown-menu\">";
-                foreach ($list as $i => &$subitem) {
-                    if ($subitem->parent_id == $item->id) {
+                if (!count($list)) {
+                    return "";
+                }
+                
+                if ($item->level == 1) {
+                    $dropdown_properties['multi-level'] = "class=\"dropdown-menu multi-level\"";
+                    $dropdown_properties['sub-level']   = $item_class ? $css_item_class : "";
+                    $dropdown_properties['caret']       = "<span class=\"caret_spacer\"></span><b class=\"caret\"></b>";
+                } else {
+                    $dropdown_properties['multi-level'] = "class=\"dropdown-menu\"";
+                    $dropdown_properties['sub-level']   = "class=\"dropdown-submenu $item_class\"";
+                    $dropdown_properties['caret']       = "";
+                }
+                
+                if ($item_class) {
+                    $subnav_class     = trim($subnav_class);
+                    $css_subnav_class = "class=\"{$subnav_class}\"";
+                } else {
+                    $css_subnav_class = "";
+                }
+                
+                $parent_menu_item_drop_link = "<a href=\"#\" class=\"dropdown-toggle {$subnav_class}\" data-toggle=\"dropdown\">{$item->title}{$dropdown_properties['caret']}</a>";
+                
+                $menu_item[] = "<li {$dropdown_properties['sub-level']} >";
+                $menu_item[] = $parent_menu_item_drop_link;
+                $menu_item[] = "<ul {$dropdown_properties['multi-level']} >";
+                
+                foreach ($list as $i => $subitem) {
+                    
+                    if ($subitem->parent_id == $item->id && $subitem->flink != $item->flink) {
                         if ($subitem->parent) {
-                            $new_sub_item = self::Build_BootStrap_MenuItem($subitem, $list, $class, $show_subnav);
+                            
+                            $item_class .= ' dropdown-sub-menu-item';
+                            
+                            $new_sub_item = self::Build_BootStrap_MenuItem($subitem, $item_class, $list, $show_subnav, 'sub-menu-item');
                             $menu_item[]  = $new_sub_item;
+                            
                         } else {
-                            $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
+                            
+                            $menu_item[] = "<li {$css_item_class} ><a {$css_subnav_class} href=\"{$subitem->flink}\">{$subitem->title}</a></li>";
                         }
+                        
+                        unset($list[$i]);
+                        
                     }
                 }
                 
@@ -245,6 +290,7 @@ class ModBootstrapnavHelper
         }
         
         $rendered_menu_item = implode('', $menu_item);
+        
         return $rendered_menu_item;
     }
     
