@@ -216,7 +216,11 @@ class ModBootstrapnavHelper
             
             if (!$show_subnav) {
                 
-                $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
+                if ($item->level == 1) {
+                    
+                    $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
+                    
+                }
                 
             } else {
                 
@@ -226,7 +230,7 @@ class ModBootstrapnavHelper
                 foreach ($list as $i => &$subitem) {
                     if ($subitem->parent_id == $item->id) {
                         if ($subitem->parent) {
-                            $new_sub_item = self::Build_BootStrap_MenuItem($subitem, $list, $class);
+                            $new_sub_item = self::Build_BootStrap_MenuItem($subitem, $list, $class, $show_subnav);
                             $menu_item[]  = $new_sub_item;
                         } else {
                             $menu_item[] = "<li class=\"{$item_class}\"><a href=\"{$item->flink}\">{$item->title}</a></li>";
