@@ -136,7 +136,10 @@ defined('_JEXEC') or die;
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav <?php echo $float; ?>">
 			<?php
-				$bootstrap_menu = ModBootstrapnavHelper::Build_BootStrap_Menu($list, $path, $active_id, $show_subnav);
+				
+				$bootstrap_menu_generator = new ModBootStrapMenuGenerator();
+			
+				$bootstrap_menu = $bootstrap_menu_generator->Build_BootStrap_Menu($list, $path, $active_id, $show_subnav);
 				echo $bootstrap_menu;
 			?>
             </ul>

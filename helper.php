@@ -154,6 +154,36 @@ class ModBootstrapnavHelper
     }
     
     
+    
+    
+}
+/**
+ * @version     1.1
+ * @package     mod_bootstrapnav
+ * @copyright   Copyright (C) 2015. All rights reserved.
+ * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @author      Michael Jones <mikegrahamjones@gmail.com>
+ */
+class ModBootStrapMenuGenerator
+{
+    
+    
+    /**
+     * Track individual menu items; by the $item->id
+     * @type array (KVP)
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    private $menu_items_created = false;
+    
+    
+    /**
+     * Debug tracked items; as the menu is generated
+     * @type boolean
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    private $debug_created_menus = false;
+    
+    
     /**
      * Allow for complete recursion on the BootStrap Menu
      * @param array $list
@@ -163,16 +193,17 @@ class ModBootstrapnavHelper
      * @return  html
      * @author Michael Jones <mikegrahamjones@gmail.com>
      */
-    public static function Build_BootStrap_Menu($list, $path, $active_id, $show_subnav = TRUE)
+    public function Build_BootStrap_Menu($item_list, $path, $active_id, $show_subnav = TRUE, $bootstrap_menu = array())
     {
+        $this->menu_items_created = array();
         
-        $bootstrap_menu = array();
-        
-        if (!count($list)) {
+        if (!count($item_list) || !is_array($item_list)) {
             return "";
         }
         
-        foreach ($list as $i => &$item) {
+        $bootstrap_menu_item_keys = array_keys($bootstrap_menu);
+        
+        foreach ($item_list as $item_list_index => &$item) {
             
             $class = '';
             
@@ -183,9 +214,17 @@ class ModBootstrapnavHelper
                 $class .= ' active';
             }
             
-            $bootstrap_menu[$item->id] = self::Build_BootStrap_MenuItem($item, $class, $list, $show_subnav);
+            if ($this->Is_Joomla_Item_New($item, 'first_level')) {
+                
+                $rendered_menu_item = $this->Build_BootStrap_MenuItem($item, $class, $item_list, $show_subnav);
+                
+                $bootstrap_menu[] = $rendered_menu_item;
+                
+            }
             
+            unset($item_list[$item_list_index]);
         }
+        
         
         // Render our List
         $rendered_bootstrap_menu = implode('', $bootstrap_menu);
@@ -193,6 +232,109 @@ class ModBootstrapnavHelper
         // Return the List
         return $rendered_bootstrap_menu;
         
+    }
+    
+    /**
+     * Create a <li></li> menu item
+     * @param object stdClass $item
+     * @param string $item_class
+     * @param string $link_class
+     * @param string $link_title
+     * @param string $link_data
+     * @return  html
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    protected function Create_BootStrap_Menu_Item($item, $item_class = '', $link_class = '', $link_title = '', $link_data = '')
+    {
+        
+        if ($this->Is_Joomla_Item_New($item, 'created')) {
+            
+            $properties['li-class'] = $item_class ? "class=\"$item_class\"" : "";
+            $properties['li-id']    = "id=\"bootstrap_li_menu_item_{$item->id}\"";
+            
+            $joomla_link_item = $this->Create_BootStrap_Menu_Link($item->title, $item->flink, $link_class, "bootstrap_a_menu_item_{$item->id}", $link_title, $link_data);
+            
+            $joomla_menu_item_rendered = "<li {$properties['li-class']} {$properties['li-id']} >{$joomla_link_item}</li>";
+            
+            $this->Track_BootStrap_Menu_Item($item);
+            
+            return $joomla_menu_item_rendered;
+            
+        }
+        
+        return "";
+        
+    }
+    
+    /**
+     * Create a <a></a> menu item; inherts Create_BootStrap_Menu_Item
+     * @param object $link_content
+     * @param string $link_href
+     * @param string $link_class
+     * @param string $link_id
+     * @param string $link_title
+     * @param string $link_data
+     * @return  html
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    protected function Create_BootStrap_Menu_Link($link_content = '', $link_href = '', $link_class = '', $link_id = '', $link_title = '', $link_data = '')
+    {
+        
+        $properties['class'] = $link_class ? "class=\"$link_class\"" : "";
+        $properties['id']    = $link_id ? "id=\"{$link_id}\"" : "";
+        $properties['title'] = $link_title ? "title=\"$link_title\"" : "";
+        $properties['href']  = $link_href ? "href=\"{$link_href}\"" : "href=\"#\"";
+        
+        $joomla_link_rendered = "<a {$properties['class']} {$properties['id']} {$properties['title']} {$link_data} {$properties['href']} >{$link_content}</a>";
+        
+        return $joomla_link_rendered;
+        
+    }
+    
+    /**
+     * Track a Item; so it does not get re-created
+     * @param object stdClass $item
+     * @return  html
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    protected function Track_BootStrap_Menu_Item($item)
+    {
+        
+        $this->menu_items_created[$item->id] = $item;
+        
+        return true;
+        
+    }
+    
+    /**
+     * Track a Item; so it does not get re-created
+     * @param object stdClass $item
+     * @param string $scan_event
+     * @return  html
+     * @author Michael Jones <mikegrahamjones@gmail.com>
+     */
+    protected function Is_Joomla_Item_New($item, $scan_event = '')
+    {
+        
+        if (count($this->menu_items_created) > 0 && is_array($this->menu_items_created)) {
+            
+            $item_is_new = !isset($this->menu_items_created[$item->id]);
+            
+            if ($this->debug_created_menus) {
+                
+                // echo "Checking item {$item->id} in menu_items_created from <b>{$scan_event}</b><br/>";
+                // echo "The item at INDEX <b>{$item->id}</b> " . ($item_is_new ? "New" : "Created") . "<br/>";
+                
+                // echo "<pre>";
+                // print_r(array_keys($this->menu_items_created));
+                // echo "</pre>";
+                
+            }
+            
+            return $item_is_new;
+        }
+        
+        return true;
     }
     
     
@@ -206,10 +348,14 @@ class ModBootstrapnavHelper
      * http://bootsnipp.com/snippets/featured/multi-level-navbar-menu
      * @author Michael Jones <mikegrahamjones@gmail.com>
      */
-    public static function Build_BootStrap_MenuItem($item, $item_class, &$list, $show_subnav = TRUE, $subnav_class = NULL)
+    protected function Build_BootStrap_MenuItem($item, $item_class, $list, $show_subnav = TRUE, $subnav_class = NULL)
     {
         
         $menu_item = array();
+        
+        if (!$this->Is_Joomla_Item_New($item, 'menu_item')) {
+            return "";
+        }
         
         if ($item_class) {
             $item_class     = trim($item_class);
@@ -221,7 +367,7 @@ class ModBootstrapnavHelper
         if (!$item->parent) {
             
             if ($item->level == 1) {
-                $menu_item[] = "<li {$css_item_class} ><a class=\"top-level-menu-item\" href=\"{$item->flink}\">{$item->title}</a></li>";
+                $menu_item[] = $this->Create_BootStrap_Menu_Item($item, $item_class);
             }
             
         } else {
@@ -230,7 +376,7 @@ class ModBootstrapnavHelper
                 
                 if ($item->level == 1) {
                     
-                    $menu_item[] = "<li {$css_item_class} ><a class=\"top-level-menu-item\"  href=\"{$item->flink}\">{$item->title}</a></li>";
+                    $menu_item[] = $this->Create_BootStrap_Menu_Item($item, $item_class, 'top-level-menu-item');
                     
                 }
                 
@@ -250,35 +396,26 @@ class ModBootstrapnavHelper
                     $dropdown_properties['caret']       = "";
                 }
                 
-                if ($item_class) {
-                    $subnav_class     = trim($subnav_class);
-                    $css_subnav_class = "class=\"{$subnav_class}\"";
-                } else {
-                    $css_subnav_class = "";
-                }
-                
-                $parent_menu_item_drop_link = "<a href=\"#\" class=\"dropdown-toggle {$subnav_class}\" data-toggle=\"dropdown\">{$item->title}{$dropdown_properties['caret']}</a>";
-                
                 $menu_item[] = "<li {$dropdown_properties['sub-level']} >";
-                $menu_item[] = $parent_menu_item_drop_link;
+                $menu_item[] = $this->Create_BootStrap_Menu_Link("{$item->title}{$dropdown_properties['caret']}", "#", "$subnav_class dropdown-toggle", "", "", "data-toggle=\"dropdown\"");
                 $menu_item[] = "<ul {$dropdown_properties['multi-level']} >";
                 
-                foreach ($list as $i => $subitem) {
+                foreach ($list as $list_index => $subitem) {
                     
-                    if ($subitem->parent_id == $item->id && $subitem->flink != $item->flink) {
+                    if ($subitem->parent_id == $item->id && $this->Is_Joomla_Item_New($subitem, 'sub_menu')) {
+                        
                         if ($subitem->parent) {
                             
                             $item_class .= ' dropdown-sub-menu-item';
                             
-                            $new_sub_item = self::Build_BootStrap_MenuItem($subitem, $item_class, $list, $show_subnav, 'sub-menu-item');
+                            $new_sub_item = $this->Build_BootStrap_MenuItem($subitem, $item_class, $list, $show_subnav, 'sub-menu-item');
                             $menu_item[]  = $new_sub_item;
                             
                         } else {
                             
-                            $menu_item[] = "<li {$css_item_class} ><a {$css_subnav_class} href=\"{$subitem->flink}\">{$subitem->title}</a></li>";
+                            $menu_item[] = $this->Create_BootStrap_Menu_Item($subitem, $item_class, $subnav_class);
+                            
                         }
-                        
-                        unset($list[$i]);
                         
                     }
                 }
@@ -289,9 +426,12 @@ class ModBootstrapnavHelper
             }
         }
         
+        $this->Track_BootStrap_Menu_Item($item);
+        
         $rendered_menu_item = implode('', $menu_item);
         
         return $rendered_menu_item;
     }
     
 }
+?>
